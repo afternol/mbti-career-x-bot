@@ -9,17 +9,18 @@ Claude API（claude-sonnet-4-6）で毎回動的生成。
   4. article_intro - タイプ別記事紹介（URL付き）
   5. quiz          - 診断クイズ形式
 """
+import json
 import re
 import random
 from pathlib import Path
 
 import anthropic
 
-import sys
-sys.path.insert(0, str(Path(__file__).parent.parent))
-from generate_articles import TYPES
-
 from config import ANTHROPIC_API_KEY, SITE_URL
+
+# ── 16タイプデータ（generate_articles.py から独立した軽量版）────
+_TYPES_FILE = Path(__file__).parent / "types_data.json"
+TYPES: dict = json.loads(_TYPES_FILE.read_text(encoding="utf-8"))
 
 # ── Claudeクライアント ────────────────────────────────────
 _client = None
