@@ -1,0 +1,19 @@
+# 機密情報（絶対にコミットしない）
+.env
+
+# ローカル運用ファイル（GitHub Actionsでは不要）
+rt_log.json
+start_bot.bat
+start_bot_hidden.vbs
+register_task.ps1
+
+# ログ
+*.log
+logs/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# ※ posted_log.json は投稿履歴として意図的にコミットする
