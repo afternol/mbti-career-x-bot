@@ -29,7 +29,7 @@ permissions:
 jobs:
   tweet:
     runs-on: ubuntu-latest
-    timeout-minutes: 110   # ランダム遅延（最大90分）+ 処理時間を考慮
+    timeout-minutes: 100   # ランダム遅延（最大90分）+ 処理時間を考慮
 
     steps:
       - name: ランダム遅延（bot検知防止）

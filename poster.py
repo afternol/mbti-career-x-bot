@@ -93,14 +93,34 @@ def run(content_type: str | None = None, dry_run: bool = False) -> None:
         print("[poster] ドライラン: 投稿・ログ保存をスキップ")
         return
 
-    # 3. X に投稿
-    client = get_x_client()
-    try:
-        response = client.create_tweet(text=text)
-        tweet_id = str(response.data["id"])
-        print(f"[poster] 投稿成功 tweet_id={tweet_id}")
-    except tweepy.TweepyException as e:
-        print(f"[poster] 投稿エラー: {e}")
+    # 3. X に投稿（403 not-permitted はコンテンツ再生成してリトライ）
+    client   = get_x_client()
+    tweet_id = None
+    MAX_RETRIES = 3
+    for attempt in range(1, MAX_RETRIES + 1):
+        try:
+            response = client.create_tweet(text=text)
+            tweet_id = str(response.data["id"])
+            print(f"[poster] 投稿成功 tweet_id={tweet_id}")
+            break
+        except tweepy.errors.Forbidden as e:
+            err_str = str(e)
+            if "not permitted" in err_str and attempt < MAX_RETRIES:
+                # スパム検知と判断 → コンテンツ再生成してリトライ
+                print(f"[poster] 403 not-permitted（{attempt}回目）→ コンテンツ再生成してリトライ")
+                tweet = generate_tweet(content_type=content_type, recent_tweets=recent_texts)
+                text  = tweet["text"]
+                ctype = tweet["type"]
+                print(f"[poster] 再生成完了 type={ctype}")
+                print(f"--- 本文（再生成）---\n{text}\n-----------")
+            else:
+                print(f"[poster] 投稿エラー（リトライ上限 or 権限エラー）: {e}")
+                sys.exit(1)
+        except tweepy.TweepyException as e:
+            print(f"[poster] 投稿エラー: {e}")
+            sys.exit(1)
+    if tweet_id is None:
+        print("[poster] 全リトライ失敗")
         sys.exit(1)
 
     # 4. ログに追記して保存
