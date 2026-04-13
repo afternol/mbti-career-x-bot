@@ -29,9 +29,17 @@ permissions:
 jobs:
   tweet:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 110   # ランダム遅延（最大90分）+ 処理時間を考慮
 
     steps:
+      - name: ランダム遅延（bot検知防止）
+        # 手動実行(workflow_dispatch)のときは遅延なし
+        if: ${{ github.event_name == 'schedule' }}
+        run: |
+          DELAY=$((RANDOM % 5400))   # 0〜90分（秒換算）
+          echo "待機時間: $((DELAY / 60))分 $((DELAY % 60))秒"
+          sleep $DELAY
+
       - name: Checkout
         uses: actions/checkout@v4
 
