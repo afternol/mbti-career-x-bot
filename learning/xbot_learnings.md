@@ -375,6 +375,27 @@ Restart-ScheduledTask -TaskName "MBTICareerXBot"
 
 ---
 
+## 14. 2026-04-15 障害対応記録
+
+### 発生した問題
+- `scheduler.py` ソースファイルが消失 → ローカルボット完全停止（4/13以降）
+- `config.py` に `X_BEARER_TOKEN`, `BOT_ACCOUNT_ID`, `RT_KEYWORDS`, `RT_TARGET_ACCOUNTS`, `RT_DAILY_LIMIT`, `RT_LOG` が未定義 → `retweeter.py` が ImportError
+
+### 修正内容
+1. `config.py` に不足変数を追加（`.env` に既に値あり、読み込みコードが欠落していた）
+2. `scheduler.py` を再作成（learning doc の設計思想に基づき再実装）
+
+### 再発防止
+- `scheduler.py` は重要なコアファイル。削除・移動しない
+- `config.py` の変数と `retweeter.py` のimport行は必ず同期を保つ
+
+### ユーザー対応が必要な残タスク
+1. X Developer Portal → App Settings → App permissions → **Read and Write** を確認（403 oauth1 エラーの根本原因）
+   - 変更後は必ず **Access Token & Secret を再生成** して `.env` を更新
+2. 管理者 PowerShell で `.\register_task.ps1` を実行 → Windows タスクスケジューラに再登録
+
+---
+
 ## 13. 今後の改善候補
 
 | 優先度 | 内容 |

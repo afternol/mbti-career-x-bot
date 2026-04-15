@@ -105,7 +105,15 @@ def run(content_type: str | None = None, dry_run: bool = False) -> None:
             break
         except tweepy.errors.Forbidden as e:
             err_str = str(e)
-            if "not permitted" in err_str and attempt < MAX_RETRIES:
+            if "oauth1" in err_str or "app permissions" in err_str:
+                # App permissions が Read only → Developer Portal で Read+Write に変更し Access Token 再生成が必要
+                print(f"[poster] 403 権限エラー: X Developer Portal の App permissions を確認してください")
+                print(f"[poster]   → https://developer.x.com/en/portal/projects")
+                print(f"[poster]   → App Settings > User authentication settings > App permissions")
+                print(f"[poster]   → 「Read and Write」に変更後、Access Token & Secret を再生成して GitHub Secrets を更新")
+                print(f"[poster] エラー詳細: {e}")
+                sys.exit(1)
+            elif "not permitted" in err_str and attempt < MAX_RETRIES:
                 # スパム検知と判断 → コンテンツ再生成してリトライ
                 print(f"[poster] 403 not-permitted（{attempt}回目）→ コンテンツ再生成してリトライ")
                 tweet = generate_tweet(content_type=content_type, recent_tweets=recent_texts)
@@ -114,7 +122,7 @@ def run(content_type: str | None = None, dry_run: bool = False) -> None:
                 print(f"[poster] 再生成完了 type={ctype}")
                 print(f"--- 本文（再生成）---\n{text}\n-----------")
             else:
-                print(f"[poster] 投稿エラー（リトライ上限 or 権限エラー）: {e}")
+                print(f"[poster] 投稿エラー（リトライ上限 or 不明な権限エラー）: {e}")
                 sys.exit(1)
         except tweepy.TweepyException as e:
             print(f"[poster] 投稿エラー: {e}")

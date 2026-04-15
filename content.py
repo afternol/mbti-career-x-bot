@@ -72,7 +72,8 @@ CHARACTER_SYSTEM = f"""あなたは「キャリア研たろう」というキャ
 
 【投稿の追加ルール】
 - X文字数上限：280カウント以内（日本語1文字=2カウント、URL=23カウント固定、改行=1カウント）
-  → 日本語中心なら本文は実質110〜120文字程度が目安。必ず守ること。
+  → 日本語だけで書くなら【最大130文字】が絶対上限。必ず130文字以内に収めること。
+  → ハッシュタグ・改行・URLが加わるので、本文は90〜110文字が目安。
 - URLは1件まで。ハッシュタグは2〜3個のみ。
 - 改行は適切に使い、読みやすくする。
 - 「キャリア研たろうです」などの自己紹介は不要。
@@ -276,18 +277,26 @@ def _call_claude(prompt: str, max_retries: int = 3) -> str:
             # X文字数チェック（280超えなら再生成）
             char_count = _x_char_count(text)
             if char_count > 280:
+                over = char_count - 280
                 if attempt < max_retries - 1:
-                    over = char_count - 280
+                    print(f"[content] 文字数超過 {char_count}/280 (+{over}) → 再生成 ({attempt+1}/{max_retries})")
+                    # 日本語換算で何文字削るかを明示する（CJK=2カウントをClaudeが理解しやすいよう）
+                    cut_chars = (over + 1) // 2
                     full_prompt = (
                         f"{full_prompt}\n\n"
-                        f"※前回の生成が{char_count}カウントで超過しました。{over}カウント分短くしてください。"
+                        f"※前回の生成が280カウントを{over}超過しました。"
+                        f"日本語に換算して約{cut_chars}文字削ってください（全体を130文字以内に収めること）。"
                     )
                     continue
+                else:
+                    print(f"[content] 警告: 文字数超過 {char_count}/280 (+{over}) のまま返します（リトライ上限）")
 
             return text
 
         except Exception as e:
-            if attempt == max_retries - 1:
+            if attempt < max_retries - 1:
+                print(f"[content] Claude API エラー (attempt {attempt+1}/{max_retries}): {e} → リトライ")
+            else:
                 raise RuntimeError(f"Claude API エラー: {e}") from e
 
     return ""
