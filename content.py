@@ -77,6 +77,7 @@ CHARACTER_SYSTEM = f"""あなたは「キャリア研たろう」というキャ
 - URLは1件まで。ハッシュタグは2〜3個のみ。
 - 改行は適切に使い、読みやすくする。
 - 「キャリア研たろうです」などの自己紹介は不要。
+- **や*によるMarkdown強調記法（**テキスト** や *テキスト*）は絶対に使わない。Xでは装飾されずAI臭が出るため厳禁。強調には改行・行頭配置・「・」「→」「▶」などの記号を使うこと。
 
 【出力形式】
 ツイート本文のみを出力。「ツイート：」「以下が〜」などの前置きは一切不要。"""
@@ -273,6 +274,9 @@ def _call_claude(prompt: str, max_retries: int = 3) -> str:
                 messages=[{"role": "user", "content": full_prompt}],
             )
             text = response.content[0].text.strip()
+
+            # Markdown強調記法（*）をすべて除去
+            text = re.sub(r'\*+', '', text)
 
             # X文字数チェック（280超えなら再生成）
             char_count = _x_char_count(text)
