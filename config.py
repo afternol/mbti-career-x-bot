@@ -19,13 +19,41 @@ ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
 # ── サイト情報 ──────────────────────────────────────────────────
 SITE_URL = os.getenv("SITE_URL", "https://career-kentaro.com/mbti/")
 
-# ── コンテンツタイプと重み ────────────────────────────────────────
+# ── コンテンツタイプと重み（合計=100、全30種） ───────────────────
 CONTENT_TYPES = {
-    "aruaru":        35,  # MBTIタイプ別あるある
-    "tips":          20,  # 適職・キャリアTips
-    "article_intro": 20,  # タイプ別記事紹介（URL付き）
-    "site_lead":     15,  # サイト全体への誘導（URL付き）
-    "quiz":          10,  # 診断クイズ形式
+    # ── 第1陣（既存改修・主軸） ──
+    "aruaru":             8,  # MBTIタイプ別あるある
+    "tips":               6,  # 適職・キャリアTips
+    "article_intro":      5,  # タイプ別記事紹介（URL付き）
+    "site_lead":          4,  # サイト全体への誘導（URL付き）
+    "quiz":               3,  # 診断クイズ形式
+    # ── 第2陣（前回追加） ──
+    "case_story":         5,  # 相談事例風
+    "work_env":           5,  # 職場環境ミスマッチ論
+    "cognitive":          4,  # 認知機能解説
+    "pair_compare":       4,  # 2タイプ比較
+    "reframe":            5,  # 弱みを強みに読み替え
+    "micro_voice":        5,  # 短文のぼやき
+    "myth_buster":        4,  # MBTI誤解の訂正
+    # ── 第3陣（今回追加18種） ──
+    "boss_subordinate":   3,  # 上司・部下の相性と対処
+    "interview_scene":    2,  # 面接シーンのタイプ別振る舞い
+    "resignation_signs":  3,  # 退職を考えるサイン（タイプ別）
+    "stress_recovery":    3,  # ストレス対処・回復方法
+    "team_role":          2,  # チーム内での役割傾向
+    "side_job":           2,  # 副業との相性
+    "money_view":         2,  # お金・年収との向き合い方
+    "growth_phase":       2,  # 年代別キャリア論
+    "industry_fit":       2,  # 業界別の向き不向き
+    "remote_work":        2,  # リモートワーク適性
+    "management_style":   2,  # マネジメント・管理職向け
+    "dialogue":           3,  # 対話形式（相談者×研たろう）
+    "list_format":        3,  # リスト形式（3つのポイント）
+    "counter_argument":   3,  # 一般論への反論
+    "type_strength_3":    2,  # 隠れた強み3選
+    "bad_company_signs":  2,  # 合わない会社のサイン
+    "transferable_skill": 2,  # ポータブルスキル論
+    "deep_question":      2,  # 働くとは何かという問い
 }
 
 # ── X API Bearer Token（検索系API用：Free tierでは401になるため実質未使用） ──
